@@ -1,6 +1,6 @@
 import { AppPage } from './app.po';
 
-describe('angular-crud-op App', () => {
+describe('api-angular App', () => {
   let page: AppPage;
 
   beforeEach(() => {
