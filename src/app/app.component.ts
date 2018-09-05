@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Http, Response } from '@angular/http';
 
 import { FetchDataService } from './fetch-data.service';
 import { AppError } from './app-err';
@@ -22,18 +21,14 @@ export class AppComponent implements OnInit {
     let post = { title: userInput.value };
     userInput.value = '';
     this.service.create(post)
-      .subscribe((newPost: Response) => {
-        post['id'] = newPost.json().id;
+      .subscribe((newPost) => {
+        post['id'] = newPost.id;
         this.posts.splice(0, 0, post);
       },
-        (resources: AppError) => {
-          if (resources instanceof BadRequest) {
-            alert('Content not Found');
-            // this.form.setErrors(error.originalError)
-          }
-          else {
-            alert('Unexpected error occured');
-          }
+        (error: AppError) => {
+          if (error instanceof BadRequest) { alert('Content not Found'); }
+          // this.form.setErrors(error.originalError)
+          else throw error;
         }
       );
   }
@@ -41,31 +36,24 @@ export class AppComponent implements OnInit {
   removePost(post) {
 
     this.service.remove(post)
-      .subscribe((remove: Response) => {
+      .subscribe(() => {
         let index = this.posts.indexOf(post);
         this.posts.splice(index, 1);
       },
         (error: AppError) => {
-          if (error instanceof NotFoundError) {
-            alert('Content Not Found');
-          } else {
-            alert('Unexpected error occured');
-          }
+          if (error instanceof NotFoundError) { alert('Content Not Found'); }
+          else { throw error; }
         }
       );
   }
 
   ngOnInit() {
-    this.service.getAll().subscribe((response: Response) => {
-      this.posts = response.json();
+    this.service.getAll().subscribe((response) => {
+      this.posts = response;
     },
-      (resources: AppError) => {
-        if (resources instanceof NotFoundError) {
-          alert('Content Not Found');
-        }
-        else {
-          alert('Unexpected Error Occurred');
-        }
+      (error: AppError) => {
+        if (error instanceof NotFoundError) { alert('Content Not Found'); }
+        else { throw error; }
       }
     );
   }
